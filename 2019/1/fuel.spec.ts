@@ -1,4 +1,4 @@
-import { fuelForMass, totalFuelForMass } from "./day1";
+import { fuelForMass, totalFuelForMass } from "./fuel";
 
 describe("fuel for mass", () => {
   [

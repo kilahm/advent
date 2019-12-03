@@ -5,10 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watch",
-    "day1.1": "ts-node day1/part1.ts",
-    "day1.2": "ts-node day1/part2.ts",
-    "day2.1": "ts-node day2/part1.ts",
-    "day2.2": "ts-node day2/part2.ts"
+    "start": "ts-node index.ts"
   },
   "author": "",
   "license": "ISC",
