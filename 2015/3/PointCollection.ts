@@ -1,4 +1,4 @@
-import { Point } from './Point';
+import { Point } from '../../shared/grid';
 
 export class PointCollection {
   private pointMap: { [x: number]: { [y: number]: Point } } = {};

@@ -1,7 +1,4 @@
-export interface Point {
-  readonly x: number;
-  readonly y: number;
-}
+import { Point } from '../../shared/grid';
 
 export interface Segment {
   readonly start: Point;
