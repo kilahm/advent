@@ -1,8 +1,14 @@
-import { Computer } from './computer';
+import { ArrayReaderWriter, Computer, ConsoleReaderWriter } from '../../shared/computer';
 
-export function gravityProgram(noun: number, verb: number): number {
+export async function gravityProgram(noun: number, verb: number): Promise<number> {
   const startingMemory = [1, noun, verb, ...gravityAssistMemory];
-  return (new Computer(startingMemory)).result()[0];
+  const arw = new ArrayReaderWriter([]);
+  const crw = new ConsoleReaderWriter();
+  arw.tee(crw);
+  const c = new Computer(startingMemory, arw);
+  const result = await c.execute();
+  crw.close();
+  return result[0];
 }
 const gravityAssistMemory = [
   3,
