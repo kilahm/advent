@@ -1,12 +1,12 @@
 import { loadInput } from '../../shared/input';
 import { join } from 'path';
-import { ArrayReaderWriter, Computer, ConsoleReaderWriter } from '../../shared/computer';
+import { ArrayReaderWriter, Computer, ConsoleWriter } from '../../shared/computer';
 import { answer } from '../../shared/answer';
 
 (async () => {
   const input = await loadInput(join(__dirname, 'input.txt'));
   const program = input[0].split(',').map(i => parseInt(i, 10));
-  const consolerw = new ConsoleReaderWriter();
+  const consolerw = new ConsoleWriter();
   const rw = new ArrayReaderWriter(['5']);
   rw.tee(consolerw);
   const c = new Computer(program, rw);

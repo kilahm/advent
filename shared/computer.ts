@@ -1,5 +1,3 @@
-import { createInterface, Interface } from 'readline';
-
 enum Operation {
   add = 'add',
   multiply = 'multiply',
@@ -23,10 +21,7 @@ export class Computer {
   private inLine = 0;
   private outLine = 0;
 
-  constructor(
-    memory: number[],
-    private readerWriter: Reader & Writer
-  ) {
+  constructor(memory: number[], private readerWriter: Reader & Writer) {
     this.memory = [...memory];
   }
 
@@ -92,20 +87,13 @@ export class Computer {
 
   private async print(modes: ModeSet): Promise<void> {
     const [v] = this.advance(1);
-    await this.readerWriter.writeLine(`Out ${this.outLine}:`);
-      await this.readerWriter.writeLine(this.read(v, modes.modeForPosition(0)).toString(10));
+    await this.readerWriter.write(this.read(v, modes.modeForPosition(0)));
     this.outLine++;
   }
 
   private async query(): Promise<void> {
     const [v] = this.advance(1);
-    let value = await this.readerWriter.readLine(`In ${this.inLine}> `);
-    while (/[^0-9]/.test(value)) {
-      await this.readerWriter.writeLine('Input must be an integer');
-      value = await this.readerWriter.readLine(`In ${this.inLine}> `);
-    }
-    this.write(parseInt(value, 10), v);
-    this.inLine++;
+    this.write(await this.readerWriter.read(`In ${this.inLine++}`), v);
   }
 
   private jumpWhenTrue(modes: ModeSet): void {
@@ -223,69 +211,52 @@ class ModeSet {
 }
 
 export interface Reader {
-  readLine(query: string): Promise<string>;
+  read(query: string): Promise<number>;
 }
 
 export interface Writer {
-  writeLine(value: string): Promise<void>;
+  write(value: number): Promise<void>;
 }
 
-export interface Closer {
-  close(): void;
-}
+export class ConsoleWriter implements Writer {
+  private outCount = 0;
 
-export class ConsoleReaderWriter implements Reader, Writer, Closer {
-  private rl: Interface;
+  constructor() {}
 
-  constructor() {
-    this.rl = createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-  }
-
-  readLine(query: string): Promise<string> {
+  write(message: number): Promise<void> {
     return new Promise(resolve => {
-      this.rl.question(query, resolve);
-    });
-  }
-
-  writeLine(message: string): Promise<void> {
-    return new Promise(resolve => {
-      console.log(message);
+      console.log(`Out ${this.outCount++}: ${message}`);
       resolve();
     });
-  }
-
-  close(): void {
-    this.rl.close();
   }
 }
 
 export class ArrayReaderWriter implements Reader, Writer {
-  private computerOutput: string[] = [];
+  private computerOutput: number[] = [];
   private _tee: undefined | Writer;
+  private computerInput: number[];
+  constructor(computerInput: number[]) {
+    this.computerInput = [...computerInput];
+  }
 
-  constructor(private computerInput: string[]) {}
-
-  state(): { in: string[]; out: string[] } {
+  state(): { in: number[]; out: number[] } {
     return {
       in: [...this.computerInput],
       out: [...this.computerOutput]
     };
   }
 
-  readLine(query: string): Promise<string> {
+  read(query: string): Promise<number> {
     if (this.computerInput.length === 0) {
       throw new Error('Exhausted input from array');
     }
     return Promise.resolve(this.computerInput.shift());
   }
 
-  async writeLine(value: string): Promise<void> {
+  async write(value: number): Promise<void> {
     this.computerOutput.push(value);
-    if(this._tee) {
-      await this._tee.writeLine(value);
+    if (this._tee) {
+      await this._tee.write(value);
     }
     return Promise.resolve();
   }

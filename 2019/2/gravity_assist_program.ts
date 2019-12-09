@@ -1,9 +1,9 @@
-import { ArrayReaderWriter, Computer, ConsoleReaderWriter } from '../../shared/computer';
+import { ArrayReaderWriter, Computer, ConsoleWriter } from '../../shared/computer';
 
 export async function gravityProgram(noun: number, verb: number): Promise<number> {
   const startingMemory = [1, noun, verb, ...gravityAssistMemory];
   const arw = new ArrayReaderWriter([]);
-  const crw = new ConsoleReaderWriter();
+  const crw = new ConsoleWriter();
   arw.tee(crw);
   const c = new Computer(startingMemory, arw);
   const result = await c.execute();
