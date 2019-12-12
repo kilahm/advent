@@ -1,17 +1,15 @@
 import { loadInput } from '../../shared/input';
 import { join } from 'path';
-import { ArrayReaderWriter, Computer, ConsoleWriter } from '../../shared/computer';
+import { Computer } from '../../shared/computer';
 import { answer } from '../../shared/answer';
+import { of } from 'rxjs';
 
 (async () => {
   const input = await loadInput(join(__dirname, 'input.txt'));
   const program = input[0].split(',').map(i => parseInt(i, 10));
-  const consolerw = new ConsoleWriter();
-  const rw = new ArrayReaderWriter(['1']);
-  rw.tee(consolerw);
-  const c = new Computer(program, rw);
+  const c = new Computer(program, of(1));
+  let result = -1;
+  c.output$.subscribe(v => result = v);
   await c.execute();
-  consolerw.close();
-  const output = rw.state().out;
-  answer(output[output.length - 1]);
+  answer(result);
 })();

@@ -5,21 +5,18 @@ export async function amplify(
   phases: number[],
   program: number[]
 ): Promise<number> {
+  const inputs = phases.map(p => [p]);
+  inputs[0].push(0);
   const fbc = new FeedbackComputer(
-    program,
-    phases.length,
-    (outputs, iteration) => {
-      const fromPrevious = outputs === undefined ? 0 : outputs[0];
-      return [phases[iteration], fromPrevious];
-    }
+    program, inputs
   );
   const result = await fbc.execute();
-  return result[0];
+  return result[result.length - 1];
 }
 
-export async function maximizeAmps(program: number[]): Promise<number> {
+export async function maximizeAmps(program: number[], phaseSpace: number[]): Promise<number> {
   const values = [];
-  const phaseList = permutations([0, 1, 2, 3, 4]);
+  const phaseList = permutations(phaseSpace);
   await Promise.all(phaseList.map(async phases => {
     values.push(await amplify(phases, program));
   }));

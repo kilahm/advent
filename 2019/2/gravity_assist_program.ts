@@ -1,15 +1,13 @@
-import { ArrayReaderWriter, Computer, ConsoleWriter } from '../../shared/computer';
+import { Computer } from '../../shared/computer';
+import { EMPTY } from 'rxjs';
 
 export async function gravityProgram(noun: number, verb: number): Promise<number> {
   const startingMemory = [1, noun, verb, ...gravityAssistMemory];
-  const arw = new ArrayReaderWriter([]);
-  const crw = new ConsoleWriter();
-  arw.tee(crw);
-  const c = new Computer(startingMemory, arw);
+  const c = new Computer(startingMemory, EMPTY);
   const result = await c.execute();
-  crw.close();
   return result[0];
 }
+
 const gravityAssistMemory = [
   3,
   1,

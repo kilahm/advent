@@ -1,3 +1,6 @@
+import { Observable, Subject } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
+
 enum Operation {
   add = 'add',
   multiply = 'multiply',
@@ -18,14 +21,31 @@ enum Mode {
 export class Computer {
   private readonly memory: number[];
   private pointer = 0;
-  private inLine = 0;
-  private outLine = 0;
+  private readWaiters: Array<(number) => void> = [];
+  private readBuffer: number[] = [];
+  private readonly output = new Subject<number>();
+  readonly output$: Observable<number>;
 
-  constructor(memory: number[], private readerWriter: Reader & Writer) {
+  constructor(
+    memory: number[],
+    inputs: Observable<number>,
+    private readonly readTimeoutInSeconds = 1
+  ) {
+    this.output$ = this.output.pipe(shareReplay());
     this.memory = [...memory];
+    inputs.subscribe(value => {
+      if (this.readWaiters.length > 0) {
+        this.readWaiters.shift()(value);
+        return;
+      }
+      this.readBuffer.push(value);
+    });
   }
 
   async execute(): Promise<number[]> {
+    if (this.output.closed) {
+      throw new Error('A computer can only run once');
+    }
     while (true) {
       let op;
       try {
@@ -62,6 +82,7 @@ export class Computer {
           await this.equals(modes);
           break;
         case Operation.exit:
+          this.output.complete();
           return [...this.memory];
       }
     }
@@ -85,15 +106,30 @@ export class Computer {
     );
   }
 
-  private async print(modes: ModeSet): Promise<void> {
+  private print(modes: ModeSet): void {
     const [v] = this.advance(1);
-    await this.readerWriter.write(this.read(v, modes.modeForPosition(0)));
-    this.outLine++;
+    const value = this.read(v, modes.modeForPosition(0));
+    this.output.next(value);
   }
 
   private async query(): Promise<void> {
     const [v] = this.advance(1);
-    this.write(await this.readerWriter.read(`In ${this.inLine++}`), v);
+    this.write(await this.readInput(), v);
+  }
+
+  private async readInput(): Promise<number> {
+    if (this.readBuffer.length > 0) {
+      return this.readBuffer.shift();
+    }
+    return new Promise<number>((resolve, reject) => {
+      const timeoutTimer = setTimeout(() => {
+        reject(new Error('Timeout while waiting for input on bridge'));
+      }, this.readTimeoutInSeconds * 1000);
+      this.readWaiters.push(value => {
+        clearTimeout(timeoutTimer);
+        resolve(value);
+      });
+    });
   }
 
   private jumpWhenTrue(modes: ModeSet): void {
@@ -207,61 +243,5 @@ class ModeSet {
           `Invalid mode number ${this.modes}. Unknown mode at position ${position}.`
         );
     }
-  }
-}
-
-export interface Reader {
-  read(query: string): Promise<number>;
-}
-
-export interface Writer {
-  write(value: number): Promise<void>;
-}
-
-export class ConsoleWriter implements Writer {
-  private outCount = 0;
-
-  constructor() {}
-
-  write(message: number): Promise<void> {
-    return new Promise(resolve => {
-      console.log(`Out ${this.outCount++}: ${message}`);
-      resolve();
-    });
-  }
-}
-
-export class ArrayReaderWriter implements Reader, Writer {
-  private computerOutput: number[] = [];
-  private _tee: undefined | Writer;
-  private computerInput: number[];
-  constructor(computerInput: number[]) {
-    this.computerInput = [...computerInput];
-  }
-
-  state(): { in: number[]; out: number[] } {
-    return {
-      in: [...this.computerInput],
-      out: [...this.computerOutput]
-    };
-  }
-
-  read(query: string): Promise<number> {
-    if (this.computerInput.length === 0) {
-      throw new Error('Exhausted input from array');
-    }
-    return Promise.resolve(this.computerInput.shift());
-  }
-
-  async write(value: number): Promise<void> {
-    this.computerOutput.push(value);
-    if (this._tee) {
-      await this._tee.write(value);
-    }
-    return Promise.resolve();
-  }
-
-  tee(writer: Writer) {
-    this._tee = writer;
   }
 }

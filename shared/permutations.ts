@@ -1,5 +1,8 @@
 export function permutations(values: number[]): number[][] {
-  if(values.length < 2) {
+  if(values.length === 0) {
+    return [];
+  }
+  if(values.length === 1) {
     return [values];
   }
   const result = [];

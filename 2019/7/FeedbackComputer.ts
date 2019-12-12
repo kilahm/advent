@@ -1,33 +1,38 @@
-import { ArrayReaderWriter, Computer } from '../../shared/computer';
+import { Computer } from '../../shared/computer';
+import { concat, Observable, Subject } from 'rxjs';
+import { fromArray } from 'rxjs/internal/observable/fromArray';
 
 export class FeedbackComputer {
   private readonly program: number[];
 
-  constructor(
-    program: number[],
-    private iterations: number,
-    private inputFactory: (
-      outputs: undefined | number[],
-      iteration: number
-    ) => number[]
-  ) {
+  constructor(program: number[], private readonly initialInputs: number[][]) {
     this.program = [...program];
   }
 
   async execute(): Promise<number[]> {
-    let result: number[] = undefined;
-    for (let i = 0; i < this.iterations; i++) {
-      const inputs = this.inputFactory(result, i);
-      const rw = new ArrayReaderWriter(inputs);
-      const c = new Computer(this.program, rw);
-      try {
-        await c.execute();
-      } catch (err) {
-        throw new Error(`Error on iteration ${i}: ${err.message()}`);
-      }
-      result = rw.state().out;
-      // console.log(`Iteration ${i}: ${JSON.stringify(inputs)} -> ${result}`);
-    }
-    return result;
+    const bridge = new Subject<number>();
+    const computers: Computer[] = this.initialInputs.reduce(
+      (computerList, initialInput) => {
+        let input: Observable<number> = fromArray(initialInput);
+        if (computerList.length > 0) {
+          input = concat(input, computerList[computerList.length - 1].output$);
+        } else {
+          input = concat(input, bridge);
+        }
+        const c = new Computer(this.program, input);
+        computerList.push(c);
+        return computerList;
+      },
+      [] as Computer[]
+    );
+
+    const output = [];
+    const lastComputer = computers[computers.length - 1];
+    lastComputer.output$.subscribe(value => {
+      bridge.next(value);
+      output.push(value);
+    });
+    await Promise.all(computers.map(c => c.execute()));
+    return output;
   }
 }

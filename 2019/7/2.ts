@@ -7,5 +7,5 @@ import { maximizeAmps } from './ampCircuit';
   const program = (await loadInput(join(__dirname, 'input.txt')))[0]
     .split(',')
     .map(i => parseInt(i, 10));
-  answer(await maximizeAmps(program, [0, 1, 2, 3, 4]));
+  answer(await maximizeAmps(program, [5, 6, 7, 8, 9]));
 })();

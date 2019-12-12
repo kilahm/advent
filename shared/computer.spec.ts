@@ -1,4 +1,6 @@
-import { ArrayReaderWriter, Computer } from './computer';
+import { Computer } from './computer';
+import { fromArray } from 'rxjs/internal/observable/fromArray';
+import { cold } from 'jest-marbles';
 
 const testPrograms = [
   {
@@ -113,11 +115,13 @@ const testPrograms = [
 describe('Computer', () => {
   testPrograms.forEach(({ program, result, input, output }, programNumber) => {
     test(`Program ${programNumber}`, async () => {
-      const rw = new ArrayReaderWriter([...input]);
-      const c = new Computer(program, rw);
-      const actualResult = await c.execute();
-      expect(actualResult).toEqual(result);
-      expect(rw.state()).toEqual({ in: [], out: output });
+      const input$ = fromArray(input);
+      const c = new Computer(program, input$);
+      let actualOutput = [];
+      c.output$.subscribe(value => actualOutput.push(value));
+      const finalMemory = await c.execute();
+      expect(finalMemory).toEqual(result);
+      expect(actualOutput).toEqual(output);
     });
   });
 });
