@@ -35,12 +35,18 @@ export class Computer {
 
   constructor(
     memory: number[],
-    inputs: Observable<number>,
+    input?: Observable<number>,
     private readonly readTimeoutInSeconds = 1
   ) {
     this.output$ = this.output.pipe(shareReplay());
     this.memory = [...memory];
-    inputs.subscribe(value => {
+    if (input) {
+      this.addInput(input);
+    }
+  }
+
+  addInput(input: Observable<number>): void {
+    input.subscribe(value => {
       if (this.readWaiters.length > 0) {
         this.readWaiters.shift()(value);
         return;
@@ -335,13 +341,23 @@ export class Computer {
       this.logs = [];
     }
   }
+
+  static fromString(program: string): Computer {
+    if (/[^,0-9\-]/.test(program)) {
+      throw new Error('Program must be comma separated integers');
+    }
+    return new Computer(program.split(',').map(c => parseInt(c, 10)));
+  }
 }
 
 class ModeSet {
   private readonly modeCodes: string[];
 
   constructor(modes: number) {
-    this.modeCodes = modes.toString(10).split('').reverse();
+    this.modeCodes = modes
+      .toString(10)
+      .split('')
+      .reverse();
   }
 
   modeForPosition(position: number): Mode {
