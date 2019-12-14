@@ -1,10 +1,13 @@
+import { reduce } from './primes';
+
 export interface Point {
   x: number;
   y: number;
 }
 
 export class Bounds {
-  constructor(private a: Point, private b: Point) {}
+  constructor(private a: Point, private b: Point) {
+  }
 
   xRange(): [number, number] {
     return [Math.min(this.a.x, this.b.x), Math.max(this.a.x, this.b.x)];
@@ -25,4 +28,26 @@ export class Bounds {
     }
     return points;
   }
+}
+
+export function reduceDirection(direction: Point): Point {
+  if (direction.x === 0) {
+    return { x: 0, y: Math.sign(direction.y) };
+  }
+  if (direction.y === 0) {
+    return { x: Math.sign(direction.x), y: 0 };
+  }
+  if (Math.abs(direction.x) === 1 || Math.abs(direction.y) === 1) {
+    return { ...direction };
+  }
+  const [x, y] = reduce(direction.x, direction.y);
+  return { x, y };
+}
+
+export function pointDifference(a: Point, b: Point): Point {
+  return { x: a.x - b.x, y: a.y - b.y };
+}
+
+export function pointSum(a: Point, b: Point): Point {
+  return { x: a.x + b.x, y: a.y + b.y };
 }
