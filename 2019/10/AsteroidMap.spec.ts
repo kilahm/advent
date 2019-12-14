@@ -65,7 +65,7 @@ describe(`Map 1`, () => {
       2: { x: 12, y: 2 },
       9: { x: 12, y: 8 },
       19: { x: 16, y: 0 },
-      18: { x: 16, y: 9 },
+      49: { x: 16, y: 9 },
       99: { x: 10, y: 16 },
       198: { x: 9, y: 6 },
       199: { x: 8, y: 2 },
@@ -84,7 +84,7 @@ describe(`Map 1`, () => {
       expect(map.baseSite()).toEqual(base);
     });
     if (vaporizeOrder !== undefined) {
-      describe.skip('VaporizeOrder', function() {
+      describe('VaporizeOrder', function() {
         let vaporized: Point[];
         beforeAll(() => {
           const base = map.baseSite().location;

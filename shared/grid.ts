@@ -51,3 +51,28 @@ export function pointDifference(a: Point, b: Point): Point {
 export function pointSum(a: Point, b: Point): Point {
   return { x: a.x + b.x, y: a.y + b.y };
 }
+
+export function pointEqual(a: Point, b: Point): boolean {
+  return a.x === b.x && a.y === b.y;
+}
+
+export function quadrant(p: Point): number {
+  const encoded = `${Math.sign(p.x)}:${Math.sign(p.y)}`;
+  switch(encoded) {
+    case '1:1':
+    case '0:1':
+    case '0:0':
+    case '1:0':
+      return 1;
+    case '1:-1':
+    case '0:-1':
+      return 2;
+    case '-1:-1':
+      return 3;
+    case '-1:1':
+    case '-1:0':
+      return 4;
+    default:
+      throw new Error(`Unable to determine quadrant of ${JSON.stringify(p)}`);
+  }
+}
