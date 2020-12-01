@@ -6,7 +6,7 @@ import { banner } from './shared/display';
 const stat = util.promisify(fs.stat);
 
 function usage(): never {
-  console.log('npm start <year>/<day>/<part>');
+  console.log('npm start <year>.<day>.<part>');
   process.exit(1);
 }
 
