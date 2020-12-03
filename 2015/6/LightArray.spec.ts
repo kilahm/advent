@@ -1,6 +1,6 @@
 import { LightArray } from './LightArray';
 import { Instruction } from './Instruction';
-import { Bounds } from '../../shared/grid';
+import { Bounds } from '../../shared/vector2d';
 
 test('Light array starts empty', () => {
   expect((new LightArray()).onCount()).toBe(0);

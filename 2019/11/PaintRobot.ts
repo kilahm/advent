@@ -1,5 +1,5 @@
 import { Computer } from '../../shared/computer';
-import { Point, pointSum } from '../../shared/grid';
+import { Point, pointSum } from '../../shared/vector2d';
 import { Subject } from 'rxjs';
 
 enum NextAction {

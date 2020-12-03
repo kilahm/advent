@@ -1,5 +1,5 @@
 import { Instruction } from './Instruction';
-import { Point } from '../../shared/grid';
+import { Point } from '../../shared/vector2d';
 
 export class AncientLightArray {
   private lights = Array.from({ length: 1000 }, () =>

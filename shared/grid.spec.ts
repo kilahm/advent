@@ -1,4 +1,4 @@
-import { quadrant } from './grid';
+import { quadrant } from './vector2d';
 
 describe('quadrant', () => {
   [

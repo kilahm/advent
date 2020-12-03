@@ -1,4 +1,4 @@
-import { Point } from '../../shared/grid';
+import { Point } from '../../shared/vector2d';
 
 export class PointCollection {
   private pointMap: { [x: number]: { [y: number]: Point } } = {};

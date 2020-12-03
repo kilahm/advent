@@ -1,4 +1,4 @@
-import { Point } from '../../shared/grid';
+import { Point } from '../../shared/vector2d';
 
 export interface Segment {
   readonly start: Point;

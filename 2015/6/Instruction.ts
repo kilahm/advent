@@ -1,4 +1,4 @@
-import { Bounds, Point } from '../../shared/grid';
+import { Bounds, Point } from '../../shared/vector2d';
 
 export type InstructionType = 'turn on' | 'turn off' | 'toggle';
 

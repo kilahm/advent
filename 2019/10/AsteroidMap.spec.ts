@@ -1,7 +1,7 @@
 import { AsteroidMap } from './AsteroidMap';
 import { loadInput } from '../../shared/input';
 import { join } from 'path';
-import { Point } from '../../shared/grid';
+import { Point } from '../../shared/vector2d';
 
 describe(`Map 1`, () => {
   let map: AsteroidMap;

@@ -1,4 +1,4 @@
-import { Point, pointDifference, pointEqual, pointSum, quadrant, reduceDirection } from '../../shared/grid';
+import { Point, pointDifference, pointEqual, pointSum, quadrant, reduceDirection } from '../../shared/vector2d';
 
 export class AsteroidMap {
   private readonly asteroids: Point[] = [];

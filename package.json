@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --watch",
     "start": "ts-node index.ts",
-    "node": "ts-node"
+    "node": "ts-node--max_old_space_size=8192"
   },
   "author": "",
   "license": "ISC",
