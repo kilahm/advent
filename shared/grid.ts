@@ -28,6 +28,12 @@ export class Bounds {
     }
     return points;
   }
+
+  contains(point: Point): boolean {
+    const [xmin, xmax] = this.xRange();
+    const [ymin, ymax] = this.yRange();
+    return xmin <= point.x && point.x <= xmax && ymin <= point.y && point.y <= ymax;
+  }
 }
 
 export function reduceDirection(direction: Point): Point {
@@ -58,7 +64,7 @@ export function pointEqual(a: Point, b: Point): boolean {
 
 export function quadrant(p: Point): number {
   const encoded = `${Math.sign(p.x)}:${Math.sign(p.y)}`;
-  switch(encoded) {
+  switch (encoded) {
     case '1:1':
     case '0:1':
     case '0:0':
