@@ -1,6 +1,6 @@
 import { Computer } from '../../shared/computer';
 import { concat, Observable, Subject } from 'rxjs';
-import { fromArray } from 'rxjs/internal/observable/fromArray';
+import { from } from 'rxjs';
 
 export class FeedbackComputer {
   private readonly program: number[];
@@ -13,7 +13,7 @@ export class FeedbackComputer {
     const bridge = new Subject<number>();
     const computers: Computer[] = this.initialInputs.reduce(
       (computerList, initialInput) => {
-        let input: Observable<number> = fromArray(initialInput);
+        let input: Observable<number> = from(initialInput);
         if (computerList.length > 0) {
           input = concat(input, computerList[computerList.length - 1].output$);
         } else {

@@ -3,6 +3,7 @@
     "moduleResolution": "node",
     "downlevelIteration": true,
     "target": "esnext",
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "esModuleInterop": true
   }
 }

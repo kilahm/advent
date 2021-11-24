@@ -1,6 +1,5 @@
 import { Computer } from './computer';
-import { fromArray } from 'rxjs/internal/observable/fromArray';
-import { EMPTY } from 'rxjs';
+import { EMPTY, from } from 'rxjs';
 
 const testProgramsWithoutIO = [
   {
@@ -152,7 +151,7 @@ describe('Computer', () => {
   });
   testProgramsWithIO.forEach(({ program, input, output }, programNumber) => {
     test(`Program with IO ${programNumber}`, async () => {
-      const input$ = fromArray(input);
+      const input$ = from(input);
       const c = new Computer(program, input$);
       let actualOutput = [];
       c.output$.subscribe(value => actualOutput.push(value));
