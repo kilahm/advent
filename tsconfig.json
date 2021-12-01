@@ -4,6 +4,8 @@
     "downlevelIteration": true,
     "target": "esnext",
     "experimentalDecorators": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "strict": true
   }
 }

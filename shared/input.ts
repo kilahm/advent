@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 export async function loadInput(path: string): Promise<string[]> {
   return new Promise(async resolve => {
-    const lines = [];
+    const lines: string[] = [];
     const reader = readline.createInterface({
       input: await fs.createReadStream(path),
       terminal: false
