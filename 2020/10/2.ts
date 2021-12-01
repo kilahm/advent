@@ -12,16 +12,20 @@ class AdapterBag {
   }
 
   nextPointers(pointer: number): number[] {
-    if(pointer > this.adapters.length - 1) {
+    if (pointer > this.adapters.length - 1) {
       throw new RangeError(`${pointer} is not a valid adapter index`);
     }
 
-    if(this.isDevice(pointer)) {
-      return undefined;
+    if (this.isDevice(pointer)) {
+      return [];
     }
 
     const nextPointers: number[] = [];
-    for(let nextIndex = pointer + 1; this.adapters[nextIndex] - this.adapters[pointer] < 4; ++nextIndex) {
+    for (
+      let nextIndex = pointer + 1;
+      this.adapters[nextIndex] - this.adapters[pointer] < 4;
+      ++nextIndex
+    ) {
       nextPointers.push(nextIndex);
     }
     return nextPointers;
@@ -38,10 +42,15 @@ class AdapterBag {
   );
 
   let pointers: number[] = [0];
-  while(!pointers.every(p => bag.isDevice(p))) {
+  while (!pointers.every((p) => bag.isDevice(p))) {
     const nextPointers: number[] = [];
-    pointers.forEach(p => {
-      nextPointers.push(...(bag.nextPointers(p) ?? [p]));
+    pointers.forEach((p) => {
+      const nextForThisPointer = bag.nextPointers(p);
+      if (nextForThisPointer.length > 0) {
+        nextPointers.push(...nextForThisPointer);
+      } else {
+        nextPointers.push(p);
+      }
     });
     pointers = nextPointers;
   }

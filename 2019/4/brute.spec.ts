@@ -1,6 +1,6 @@
 import { isValidPassword } from './brute';
 
-const passwords: { [pw: number]: boolean } = {
+const passwords: { [pw: string]: boolean } = {
   '112233': true,
   '123444': false,
   '111122': true

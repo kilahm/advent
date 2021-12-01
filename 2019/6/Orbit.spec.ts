@@ -1,3 +1,4 @@
+import { assert } from 'console';
 import { OrbitSet, parseOrbit } from './Orbit';
 
 test(`Orbit count`, () => {
@@ -41,6 +42,9 @@ test(`Orbital transfer`, () => {
   orbits.map(parseOrbit).forEach(o => orbitSet.addOrbit(o.parent, o.object));
   const you = orbitSet.get('YOU');
   const san = orbitSet.get('SAN');
+  if(you === undefined || san === undefined) {
+    throw new Error();
+  }
   const commonParent = you.commonParent(san);
   const transfers = you.orbitCount(commonParent) + san.orbitCount(commonParent) - 2;
   expect(transfers).toBe(expectedTransfers);

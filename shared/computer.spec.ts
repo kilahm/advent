@@ -153,7 +153,7 @@ describe('Computer', () => {
     test(`Program with IO ${programNumber}`, async () => {
       const input$ = from(input);
       const c = new Computer(program, input$);
-      let actualOutput = [];
+      const actualOutput: number[] = [];
       c.output$.subscribe(value => actualOutput.push(value));
       const finalMemory = await c.execute();
       expect(actualOutput).toEqual(output);

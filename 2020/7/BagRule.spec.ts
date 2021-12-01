@@ -39,7 +39,7 @@ describe('BagRule', () => {
     ]
       .map((r) => BagRule.fromString(r))
       .reduce((all, r) => all.set(r.outerBag, r), new Map<string, BagRule>());
-    expect(ruleSet.get('shiny gold').countContents(ruleSet)).toBe(127);
+    expect(ruleSet.get('shiny gold')?.countContents(ruleSet)).toBe(127);
   });
 
   it('should count the contents of a bag 2', () => {
@@ -56,6 +56,6 @@ describe('BagRule', () => {
     ]
       .map((r) => BagRule.fromString(r))
       .reduce((all, r) => all.set(r.outerBag, r), new Map<string, BagRule>());
-    expect(ruleSet.get('shiny gold').countContents(ruleSet)).toBe(33);
+    expect(ruleSet.get('shiny gold')?.countContents(ruleSet)).toBe(33);
   });
 });

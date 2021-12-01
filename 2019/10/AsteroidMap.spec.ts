@@ -19,7 +19,7 @@ describe(`Map 1`, () => {
       { x: 4, y: 2 },
       { x: 4, y: 3 },
       { x: 3, y: 4 },
-      { x: 4, y: 4 }
+      { x: 4, y: 4 },
     ];
     expect(map.asteroidSites()).toEqual(asteroids);
   });
@@ -31,7 +31,7 @@ describe(`Map 1`, () => {
       { x: 1, y: 2 },
       { x: 4, y: 3 },
       { x: 3, y: 4 },
-      { x: 4, y: 4 }
+      { x: 4, y: 4 },
     ];
 
     expect(map.visibleAsteroids({ x: 0, y: 2 })).toEqual(expectedVisible);
@@ -46,15 +46,15 @@ describe(`Map 1`, () => {
 [
   {
     fileName: 'map2.txt',
-    base: { asteroidCount: 33, location: { x: 5, y: 8 } }
+    base: { asteroidCount: 33, location: { x: 5, y: 8 } },
   },
   {
     fileName: 'map3.txt',
-    base: { asteroidCount: 35, location: { x: 1, y: 2 } }
+    base: { asteroidCount: 35, location: { x: 1, y: 2 } },
   },
   {
     fileName: 'map4.txt',
-    base: { asteroidCount: 41, location: { x: 6, y: 3 } }
+    base: { asteroidCount: 41, location: { x: 6, y: 3 } },
   },
   {
     fileName: 'map5.txt',
@@ -70,9 +70,9 @@ describe(`Map 1`, () => {
       198: { x: 9, y: 6 },
       199: { x: 8, y: 2 },
       200: { x: 10, y: 9 },
-      298: { x: 11, y: 1 }
-    }
-  }
+      298: { x: 11, y: 1 },
+    },
+  },
 ].forEach(({ fileName, base, vaporizeOrder }) => {
   describe(fileName, () => {
     let map: AsteroidMap;
@@ -84,7 +84,7 @@ describe(`Map 1`, () => {
       expect(map.baseSite()).toEqual(base);
     });
     if (vaporizeOrder !== undefined) {
-      describe('VaporizeOrder', function() {
+      describe('VaporizeOrder', function () {
         let vaporized: Point[];
         beforeAll(() => {
           const base = map.baseSite().location;
@@ -95,11 +95,14 @@ describe(`Map 1`, () => {
           expect(vaporized.length).toBe(299);
         });
 
-        Object.keys(vaporizeOrder).forEach(vaporizeIndex => {
+        Object.keys(vaporizeOrder).forEach((vaporizeIndex) => {
           test(`Vaporize index ${vaporizeIndex} is at ${JSON.stringify(
+            // @ts-ignore
             vaporizeOrder[vaporizeIndex]
           )}`, () => {
+            // @ts-ignore
             expect(vaporized[vaporizeIndex]).toEqual(
+            // @ts-ignore
               vaporizeOrder[vaporizeIndex]
             );
           });
