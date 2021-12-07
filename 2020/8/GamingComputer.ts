@@ -54,7 +54,7 @@ export class GamingComputer {
         try {
           return { operation, argument: parseNumber(arg) };
         } catch (err) {
-          throw new InvalidInstruction(line, err.message);
+          throw new InvalidInstruction(line, err instanceof Error ? err.message : String(err));
         }
       })
     );

@@ -17,15 +17,19 @@ export class AsteroidMap {
   }
 
   baseSite(): { asteroidCount: number; location: Point } {
-    const result = { asteroidCount: 0, location: undefined };
+    let asteroidCount  = 0;
+    let location: Point | undefined= undefined ;
     this.asteroidSites().forEach(p => {
       const thisCount = this.visibleAsteroids(p).length;
-      if (thisCount > result.asteroidCount) {
-        result.asteroidCount = thisCount;
-        result.location = p;
+      if (thisCount > asteroidCount) {
+        asteroidCount = thisCount;
+        location = p;
       }
     });
-    return result;
+    if(location === undefined) {
+       throw new Error('Unable to find base site');
+    }
+    return {asteroidCount, location};
   }
 
   asteroidSites(): Point[] {

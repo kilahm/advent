@@ -114,7 +114,7 @@ function coincide(a: Point, b: Point): boolean {
 }
 
 function segmentIntersections(a: Segment[], b: Segment[]): Point[] {
-  const result = [];
+  const result: Point[] = [];
   a.forEach(segA => {
     b.forEach(segB => {
       if (coincide(segA.end, segB.end)) {
@@ -133,7 +133,7 @@ function pointIntersections(a: Point[], b: Point[]): Point[] {
     }
     m[p.x][p.y] = p;
     return m;
-  }, {});
+  }, {} as Record<number, Record<number, Point>>);
 
   return b.filter(p => aMap[p.x] !== undefined && aMap[p.x][p.y] !== undefined);
 }

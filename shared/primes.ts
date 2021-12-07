@@ -42,6 +42,9 @@ export function factors(value: number): number[] {
   }
 
   const factor = ps.find(p => value % p === 0);
+  if(factor === undefined) {
+    throw new Error(`Unable to find factors for ${value}`);
+  }
   factorStore[value] = [factor, ...factors(Math.floor(value / factor))];
   return [...factorStore[value]];
 }

@@ -48,37 +48,47 @@ export class Circuit {
   }
 
   private setWire(connection: string): void {
-    const {
-      groups: { name, value }
-    } = connection.match(setWire);
+    const result = connection.match(setWire);
+    if(result === null) {
+      throw new Error(`Invalid connection string: "${connection}"`)
+    }
+    const { name, value } = result.groups ?? {}; 
     this.wires.add(name, new Wire(Uint16Array.of(parseInt(value, 10))));
   }
 
   private notGate(connection: string): void {
-    const {
-      groups: { nameIn, nameOut }
-    } = connection.match(notGate);
+    const result = connection.match(notGate);
+    if(result === null) {
+      throw new Error(`Invalid connection string: "${connection}"`)
+    }
+    const { nameIn, nameOut } = result.groups ?? {}; 
     this.wires.add(nameOut, new Wire(new NotGate(nameIn, this.wires)));
   }
 
   private andGate(connection: string): void {
-    const {
-      groups: { nameA, nameB, nameOut }
-    } = connection.match(andGate);
+    const result = connection.match(andGate);
+    if(result === null) {
+      throw new Error(`Invalid connection string: "${connection}"`)
+    }
+    const { nameA, nameB, nameOut } = result.groups ?? {}; 
     this.wires.add(nameOut, new Wire(new AndGate(nameA, nameB, this.wires)));
   }
 
   private orGate(connection: string): void {
-    const {
-      groups: { nameA, nameB, nameOut }
-    } = connection.match(orGate);
+    const result = connection.match(orGate);
+    if(result === null) {
+      throw new Error(`Invalid connection string: "${connection}"`)
+    }
+    const { nameA, nameB, nameOut } = result.groups ?? {}; 
     this.wires.add(nameOut, new Wire(new OrGate(nameA, nameB, this.wires)));
   }
 
   private lShift(connection: string): void {
-    const {
-      groups: { nameIn, count, nameOut }
-    } = connection.match(lShift);
+    const result = connection.match(lShift);
+    if(result === null) {
+      throw new Error(`Invalid connection string: "${connection}"`)
+    }
+    const { nameIn, count, nameOut } = result.groups ?? {}; 
     this.wires.add(
       nameOut,
       new Wire(new LeftShift(nameIn, count, this.wires))
@@ -86,9 +96,11 @@ export class Circuit {
   }
 
   private rShift(connection: string): void {
-    const {
-      groups: { nameIn, count, nameOut }
-    } = connection.match(rShift);
+    const result = connection.match(rShift);
+    if(result === null) {
+      throw new Error(`Invalid connection string: "${connection}"`)
+    }
+    const { nameIn, count, nameOut } = result.groups ?? {}; 
     this.wires.add(
       nameOut,
       new Wire(new RightShift(nameIn, count, this.wires))
@@ -96,9 +108,11 @@ export class Circuit {
   }
 
   private passThrough(connection: string): void {
-    const {
-      groups: { nameIn, nameOut }
-    } = connection.match(passThrough);
+    const result = connection.match(passThrough);
+    if(result === null) {
+      throw new Error(`Invalid connection string: "${connection}"`)
+    }
+    const { nameIn, nameOut } = result.groups ?? {}; 
     this.wires.add(nameOut, new Wire(new LazyWire(nameIn, this.wires)));
   }
 }

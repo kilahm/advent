@@ -13,7 +13,7 @@ export class Instruction {
 
   static parse(raw: string): Instruction {
     const matches = raw.match(Instruction.parseRegex);
-    if (matches === null) {
+    if (matches === null || matches.groups === undefined) {
       throw new Error(`Invalid instruction: ${raw}`);
     }
     return new Instruction(
