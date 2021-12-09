@@ -3,6 +3,10 @@ export interface MatrixIndex {
   column: number;
 }
 
+export function sameMatrixIndex(a: MatrixIndex, b: MatrixIndex): boolean {
+  return a.column === b.column && a.row === b.row;
+}
+
 export class Matrix<T> {
   private values: T[][];
   private rowCount: number = 0;
@@ -66,6 +70,22 @@ export class Matrix<T> {
     return this.values[index.row]?.[index.column];
   }
 
+  rectiliniearNeighbors(
+    index: MatrixIndex
+  ): Iterable<{ value: T; index: MatrixIndex }> {
+    return [
+      { row: index.row + 1, column: index.column },
+      { row: index.row, column: index.column + 1 },
+      { row: index.row - 1, column: index.column },
+      { row: index.row, column: index.column - 1 },
+    ]
+      .map((i) => {
+        const v = this.get(i);
+        return v === undefined ? undefined : { value: v, index: i };
+      })
+      .filter(<U>(v: U): v is Exclude<U, undefined> => v !== undefined);
+  }
+
   forEach(fn: (value: T, index: MatrixIndex, matrix: Matrix<T>) => any) {
     [...this.values.values()].forEach((row, rowIndex) => {
       [...row.values()].forEach((value, columnIndex) =>
@@ -74,10 +94,13 @@ export class Matrix<T> {
     });
   }
 
-  reduce<U>(fn: (accumulator: U, value: T) => U, startingValue: U): U {
+  reduce<U>(
+    fn: (accumulator: U, value: T, index: MatrixIndex) => U,
+    startingValue: U
+  ): U {
     let runningAccumulator = startingValue;
-    this.forEach((v) => {
-      runningAccumulator = fn(runningAccumulator, v);
+    this.forEach((v, index) => {
+      runningAccumulator = fn(runningAccumulator, v, index);
     });
     return runningAccumulator;
   }

@@ -18,3 +18,11 @@ export function almostEqual(
   return tolerance >= a - b;
 }
 
+export function numericSort(a: number, b: number): number {
+  return a - b;
+}
+
+export function topN(list: number[], topCount: number): number[] {
+  const sorted = [...list].sort(numericSort);
+  return sorted.slice(-topCount);
+}
