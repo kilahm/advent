@@ -37,6 +37,15 @@ export class Matrix<T> {
     return this.values[index];
   }
 
+  has(index: MatrixIndex): boolean {
+    return (
+      0 <= index.row &&
+      index.row < this.height() &&
+      0 <= index.column &&
+      index.column < this.width()
+    );
+  }
+
   column(index: number): Iterable<T> | undefined {
     if (index >= this.columnCount) {
       return undefined;
@@ -70,6 +79,16 @@ export class Matrix<T> {
     return this.values[index.row]?.[index.column];
   }
 
+  set(index: MatrixIndex, value: T): this {
+    if (!this.has(index)) {
+      throw new RangeError(
+        `Cannot set index ${index} for a matrix of size ${this.height()} rows and ${this.width()} columns`
+      );
+    }
+    this.values[index.row][index.column] = value;
+    return this;
+  }
+
   rectiliniearNeighbors(
     index: MatrixIndex
   ): Iterable<{ value: T; index: MatrixIndex }> {
@@ -78,6 +97,24 @@ export class Matrix<T> {
       { row: index.row, column: index.column + 1 },
       { row: index.row - 1, column: index.column },
       { row: index.row, column: index.column - 1 },
+    ]
+      .map((i) => {
+        const v = this.get(i);
+        return v === undefined ? undefined : { value: v, index: i };
+      })
+      .filter(<U>(v: U): v is Exclude<U, undefined> => v !== undefined);
+  }
+
+  neighbors(index: MatrixIndex): Iterable<{ value: T; index: MatrixIndex }> {
+    return [
+      { row: index.row + 1, column: index.column },
+      { row: index.row, column: index.column + 1 },
+      { row: index.row - 1, column: index.column },
+      { row: index.row, column: index.column - 1 },
+      { row: index.row + 1, column: index.column + 1 },
+      { row: index.row + 1, column: index.column - 1 },
+      { row: index.row - 1, column: index.column + 1 },
+      { row: index.row - 1, column: index.column - 1 },
     ]
       .map((i) => {
         const v = this.get(i);
@@ -103,5 +140,15 @@ export class Matrix<T> {
       runningAccumulator = fn(runningAccumulator, v, index);
     });
     return runningAccumulator;
+  }
+
+  map<U>(
+    fn: (value: T, index: MatrixIndex, matrix: Matrix<T>) => U
+  ): Matrix<U> {
+    return new Matrix(
+      [...this.values.values()].map((v, row) =>
+        [...v.values()].map((u, column) => fn(u, { row, column }, this))
+      )
+    );
   }
 }
