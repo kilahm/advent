@@ -1,0 +1,42 @@
+import { join } from 'path';
+import { map } from '../../2015/1/map';
+import { answer } from '../../shared/answer';
+import { Graph, GraphNode } from '../../shared/graphs';
+import { loadInput } from '../../shared/input';
+
+(async () => {
+  const graph = new Graph<string>();
+  (await loadInput(join(__dirname, 'input.txt'))).forEach((line) => {
+    const [a, b] = line.split('-');
+    graph.link(a, b);
+  });
+
+  const start = graph.get('start');
+  if (start === undefined) {
+    throw new Error('No start for this graph');
+  }
+
+  let paths: GraphNode<string>[][] = [[start]];
+  const completePaths: GraphNode<string>[][] = [];
+  while (paths.length > 0) {
+    paths = paths.reduce((newPaths, path) => {
+      const last = path[path.length - 1];
+      if (last.state === 'end') {
+        completePaths.push(path);
+        return newPaths;
+      }
+      [...last.neighbors].forEach((neighbor) => {
+        if (
+          neighbor.state === neighbor.state.toLowerCase() &&
+          path.includes(neighbor)
+        ) {
+          return;
+        }
+        newPaths.push([...path, neighbor]);
+      });
+      return newPaths;
+    }, [] as GraphNode<string>[][]);
+  }
+
+  answer(completePaths.length);
+})().catch(console.error);
