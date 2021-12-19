@@ -1,6 +1,13 @@
+import chalk from 'chalk';
+
 export interface MatrixIndex {
   row: number;
   column: number;
+}
+
+export interface MatrixEntry<T> {
+  index: MatrixIndex;
+  value: T;
 }
 
 export function sameMatrixIndex(a: MatrixIndex, b: MatrixIndex): boolean {
@@ -89,9 +96,19 @@ export class Matrix<T> {
     return this;
   }
 
-  rectiliniearNeighbors(
-    index: MatrixIndex
-  ): Iterable<{ value: T; index: MatrixIndex }> {
+  increasingNeighbors(index: MatrixIndex): Iterable<MatrixEntry<T>> {
+    return [
+      { row: index.row + 1, column: index.column },
+      { row: index.row, column: index.column + 1 },
+    ]
+      .map((i) => {
+        const v = this.get(i);
+        return v === undefined ? undefined : { value: v, index: i };
+      })
+      .filter(<U>(v: U): v is Exclude<U, undefined> => v !== undefined);
+  }
+
+  rectiliniearNeighbors(index: MatrixIndex): Iterable<MatrixEntry<T>> {
     return [
       { row: index.row + 1, column: index.column },
       { row: index.row, column: index.column + 1 },
@@ -105,7 +122,7 @@ export class Matrix<T> {
       .filter(<U>(v: U): v is Exclude<U, undefined> => v !== undefined);
   }
 
-  neighbors(index: MatrixIndex): Iterable<{ value: T; index: MatrixIndex }> {
+  neighbors(index: MatrixIndex): Iterable<MatrixEntry<T>> {
     return [
       { row: index.row + 1, column: index.column },
       { row: index.row, column: index.column + 1 },
@@ -150,5 +167,114 @@ export class Matrix<T> {
         [...v.values()].map((u, column) => fn(u, { row, column }, this))
       )
     );
+  }
+
+  toString(
+    format?: (element: T, index: MatrixIndex, matrix: Matrix<T>) => string
+  ): string {
+    const fmt = format ?? ((element) => String(element));
+    return [...this.rows()]
+      .map((rowValues, row) =>
+        [...rowValues].reduce(
+          (acc, element, column) => acc + fmt(element, { row, column }, this),
+          ''
+        )
+      )
+      .join('\n');
+  }
+
+  findPathRectilinear(
+    from: MatrixIndex,
+    to: MatrixIndex,
+    cost: (from: MatrixEntry<T>, to: MatrixEntry<T>) => number,
+    estimatedCost: (from: MatrixEntry<T>, to: MatrixEntry<T>) => number = (
+      from,
+      to
+    ) =>
+      Math.abs(from.index.column - to.index.column) +
+      Math.abs(from.index.row - from.index.row)
+  ): { cost: number; path: MatrixEntry<T>[] } {
+    const start = this.get(from);
+    const end = this.get(to);
+    if (start === undefined || end === undefined) {
+      throw new RangeError(
+        `Matrix of size ${this.rowCount} rows by ${this.columnCount} columns does not include enpoints of path: (${from}, ${to})`
+      );
+    }
+
+    const pathHash = new Map<string, Path<T>>();
+    const paths: Path<T>[] = [];
+    let thisPath: Path<T> = new Path(0, [{ index: from, value: start }], this);
+    pathHash.set(thisPath.hash(), thisPath);
+    while (!sameMatrixIndex(to, thisPath.lastStep().index)) {
+      paths.push(
+        ...[...this.rectiliniearNeighbors(thisPath.lastStep().index)]
+          .map(
+            (nextEntry) =>
+              new Path<T>(
+                thisPath.cost + cost(thisPath.lastStep(), nextEntry),
+                [...thisPath.steps, nextEntry],
+                this
+              )
+          )
+          .filter((nextPath) => {
+            const existingPath = pathHash.get(nextPath.hash());
+            if (
+              existingPath === undefined ||
+              nextPath.cost < existingPath.cost
+            ) {
+              pathHash.set(nextPath.hash(), nextPath);
+              return true;
+            }
+            return false;
+          })
+      );
+
+      paths.sort(
+        (a, b) =>
+          a.cost +
+          estimatedCost(a.lastStep(), { index: to, value: end }) -
+          (b.cost + estimatedCost(b.lastStep(), { index: to, value: end }))
+      );
+      const nextPath = paths.shift();
+      if (nextPath === undefined) {
+        throw new Error('No path found');
+      }
+      thisPath = nextPath;
+    }
+
+    return { cost: thisPath.cost, path: thisPath.steps };
+  }
+}
+
+class Path<T> {
+  constructor(
+    readonly cost: number,
+    readonly steps: MatrixEntry<T>[],
+    private map: Matrix<T>
+  ) {
+    if (steps.length < 1) {
+      throw new Error('Zero lengh path');
+    }
+  }
+
+  contains(index: MatrixIndex): boolean {
+    return this.steps.some((entry) => sameMatrixIndex(entry.index, index));
+  }
+  lastStep(): MatrixEntry<T> {
+    return this.steps[this.steps.length - 1];
+  }
+
+  toString(): string {
+    return this.map.toString((value, index) => {
+      if (this.steps.some((entry) => sameMatrixIndex(entry.index, index))) {
+        return chalk.blackBright(chalk.bgWhite(value));
+      }
+      return chalk.gray(value);
+    });
+  }
+
+  hash(): string {
+    return `${this.lastStep().index.row},${this.lastStep().index.column}`;
   }
 }
