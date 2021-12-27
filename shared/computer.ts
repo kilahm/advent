@@ -24,7 +24,7 @@ export class Computer {
   private readonly memory: number[];
   private pointer = 0;
   private memoryPointer = 0;
-  private readWaiters: Array<(number) => void> = [];
+  private readWaiters: Array<(_: number) => void> = [];
   private readBuffer: number[] = [];
   private readonly output = new Subject<number>();
   readonly output$: Observable<number>;
@@ -48,7 +48,7 @@ export class Computer {
   addInput(input: Observable<number>): void {
     input.subscribe(value => {
       if (this.readWaiters.length > 0) {
-        this.readWaiters.shift()(value);
+        this.readWaiters.shift()?.(value);
         return;
       }
       this.readBuffer.push(value);
@@ -141,8 +141,9 @@ export class Computer {
   }
 
   private async readInput(): Promise<number> {
-    if (this.readBuffer.length > 0) {
-      return this.readBuffer.shift();
+    const next = this.readBuffer.shift();
+    if (next !== undefined) {
+      return next;
     }
     return new Promise<number>((resolve, reject) => {
       const timeoutTimer = setTimeout(() => {
@@ -249,7 +250,7 @@ export class Computer {
         default:
           throw new Error(`Unknown read mode: ${mode}`);
       }
-      if (actualAddress < 0) {
+      if (typeof actualAddress === 'number' && actualAddress < 0) {
         throw new Error(`Unable to read from address ${actualAddress}`);
       }
       let value;

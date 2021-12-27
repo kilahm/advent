@@ -15,7 +15,7 @@ export async function amplify(
 }
 
 export async function maximizeAmps(program: number[], phaseSpace: number[]): Promise<number> {
-  const values = [];
+  const values: number[] = [];
   const phaseList = permutations(phaseSpace);
   await Promise.all(phaseList.map(async phases => {
     values.push(await amplify(phases, program));

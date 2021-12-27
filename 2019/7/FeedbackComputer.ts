@@ -26,7 +26,7 @@ export class FeedbackComputer {
       [] as Computer[]
     );
 
-    const output = [];
+    const output: number[] = [];
     const lastComputer = computers[computers.length - 1];
     lastComputer.output$.subscribe(value => {
       bridge.next(value);
