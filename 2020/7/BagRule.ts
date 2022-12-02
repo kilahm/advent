@@ -8,7 +8,7 @@ export class BagRule {
   countContents(ruleSet: Map<string, BagRule>): number {
     return [...this.innerBags.entries()].reduce(
       (total, [color, count]) =>
-        total + count * ruleSet.get(color).countContents(ruleSet),
+        total + count * (ruleSet.get(color)?.countContents(ruleSet) ?? 0),
       1
     );
   }

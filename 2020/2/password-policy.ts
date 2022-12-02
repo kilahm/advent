@@ -1,3 +1,5 @@
+import { fatal } from '../../shared/display';
+
 export interface PasswordPolicy {
   validate(password: string): boolean;
 }
@@ -8,7 +10,16 @@ export class MinMaxPolicy implements PasswordPolicy {
 
   static fromString(policy: string): MinMaxPolicy {
     if (!MinMaxPolicy.cache[policy]) {
-      const { min, max, character } = MinMaxPolicy.parser.exec(policy).groups;
+      const result = MinMaxPolicy.parser.exec(policy);
+      if (result === null) {
+        fatal('Unable to parse policy');
+      }
+      const min = result.groups?.['min'];
+      const max = result.groups?.['max'];
+      const character = result.groups?.['character'];
+      if (min === undefined || max === undefined || character === undefined) {
+        fatal('Something is wrong with the regex for parsing min max policies');
+      }
       MinMaxPolicy.cache[policy] = new MinMaxPolicy(
         parseInt(min),
         parseInt(max),
@@ -42,7 +53,12 @@ export class PositionalPolicy implements PasswordPolicy {
   static fromString(policy: string): PositionalPolicy {
     if (!PositionalPolicy.cache[policy]) {
       const result = PositionalPolicy.parser.exec(policy);
-      const { pos1, pos2, char } = result.groups;
+      const pos1 = result?.groups?.['pos1'];
+      const pos2 = result?.groups?.['pos2'];
+      const char = result?.groups?.['char'];
+      if (pos1 === undefined || pos2 === undefined || char === undefined) {
+        fatal('Something is wrong with the regex for positional policies');
+      }
       PositionalPolicy.cache[policy] = new PositionalPolicy(
         parseInt(pos1),
         parseInt(pos2),

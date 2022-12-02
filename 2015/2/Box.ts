@@ -2,7 +2,7 @@ export class Box {
   readonly paperNeeded: number;
   readonly ribbonNeeded: number;
 
-  constructor(readonly l, readonly w, readonly h) {
+  constructor(readonly l: number, readonly w: number, readonly h: number) {
     const volume = l * w * h;
     const minPerimiter = 2 * (l + w + h - Math.max(l, w, h));
     const sideAreas = [l * w, w * h, h * l];
@@ -18,6 +18,10 @@ export class Box {
       throw new Error(`Invalid box definition: ${raw}`);
     }
     const dimensions = raw.split('x');
-    return new Box(dimensions[0], dimensions[1], dimensions[2]);
+    return new Box(
+      Number(dimensions[0]),
+      Number(dimensions[1]),
+      Number(dimensions[2])
+    );
   }
 }

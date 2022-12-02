@@ -10,7 +10,7 @@ export function isValidPassword(pw: number): boolean {
   return pwString
     .split('')
     .map(d => parseInt(d, 10))
-    .reduce((ascending, d, index, list) => {
+    .reduce<boolean>((ascending, d, index, list) => {
       if (index === 0) {
         return ascending;
       }

@@ -42,17 +42,18 @@ export class Orbit {
     return myParents;
   }
 
-  commonParent(other: Orbit): Orbit | undefined {
-    if (this.parent === undefined) {
+  commonParent(other: Orbit | undefined): Orbit | undefined {
+    if (this.parent === undefined || other === undefined) {
       return undefined;
     }
     const otherParents = other.parents();
     let o: Orbit = this;
-    while (!otherParents.has(o.parent)) {
-      if (o.parent === undefined) {
-        return undefined;
+    let current = o.parent;
+    while (current !== undefined) {
+      if (otherParents.has(current)) {
+        return current;
       }
-      o = o.parent;
+      current = current.parent;
     }
     return o.parent;
   }
