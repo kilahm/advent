@@ -3,7 +3,7 @@ import { answer } from '../../shared/answer';
 import { loadInput } from '../../shared/input';
 import { Matrix, MatrixIndex, sameMatrixIndex } from '../../shared/Matrix';
 import { topN } from '../../shared/numbers';
-import { bgRed } from 'chalk';
+import chalk from 'chalk';
 
 (async () => {
   const map = new Matrix<number>(
@@ -63,7 +63,9 @@ function visualize(basins: MatrixIndex[][], map: Matrix<number>) {
 
   [...map.rows()].forEach((values, row) => {
     const visualRow = [...values]
-      .map((value, column) => (inBasin({ row, column }) ? bgRed(value) : value))
+      .map((value, column) =>
+        inBasin({ row, column }) ? chalk.bgRed(value) : value
+      )
       .join('');
     console.log(visualRow);
   });
